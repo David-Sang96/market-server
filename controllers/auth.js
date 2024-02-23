@@ -18,7 +18,7 @@ exports.register = async (req, res, next) => {
     //check if user-email already existed
     const userDoc = await User.findOne({ email });
     if (userDoc) {
-      throw new Error("User is already existed!");
+      throw new Error("User is already existed");
     }
 
     const salt = bcrypt.genSaltSync(10);
@@ -31,12 +31,12 @@ exports.register = async (req, res, next) => {
     });
     return res.status(201).json({
       isSuccess: true,
-      message: "User created successfully!",
+      message: "User created successfully",
     });
-  } catch (err) {
+  } catch (error) {
     return res.status(409).json({
       isSuccess: false,
-      message: err.message,
+      message: error.message,
     });
   }
 };
@@ -56,12 +56,12 @@ exports.login = async (req, res, next) => {
     //is email existed
     const userDoc = await User.findOne({ email });
     if (!userDoc) {
-      throw new Error("E-mail does not exist!");
+      throw new Error("E-mail does not exist");
     }
     //is password match
     const isPasswordMatch = bcrypt.compareSync(password, userDoc.password);
     if (!isPasswordMatch) {
-      throw new Error("Invalid password!");
+      throw new Error("Invalid password");
     }
     const createJwtToken = jwt.sign(
       { userId: userDoc._id },
@@ -72,13 +72,33 @@ exports.login = async (req, res, next) => {
     );
     return res.status(200).json({
       isSuccess: true,
-      message: "logged in successfully!",
+      message: "logged in successfully",
       token: createJwtToken,
     });
-  } catch (err) {
+  } catch (error) {
     return res.status(401).json({
       isSuccess: false,
-      message: err.message,
+      message: error.message,
+    });
+  }
+};
+
+// to check authenticated user and allow access
+exports.checkCurrentUser = async (req, res) => {
+  try {
+    const userDoc = await User.findById(req.userId).select("name email role");
+    if (!userDoc) {
+      throw new Error("Unauthorized User");
+    }
+    return res.status(200).json({
+      isSuccess: true,
+      message: "User is authorized",
+      userDoc,
+    });
+  } catch (error) {
+    return res.status(401).json({
+      isSuccess: false,
+      message: error.message,
     });
   }
 };
