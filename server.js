@@ -5,6 +5,7 @@ const bodyParser = require("body-parser");
 require("dotenv").config();
 
 const authRoutes = require("./routes/auth");
+const productRoutes = require("./routes/product");
 
 const app = express();
 //global middleware
@@ -13,6 +14,7 @@ app.use(cors({ origin: "*" }));
 
 // routes
 app.use(authRoutes);
+app.use(productRoutes);
 
 mongoose
   .connect(process.env.MONGO_URL)
