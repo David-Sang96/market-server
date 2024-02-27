@@ -32,7 +32,8 @@ router.post(
       .withMessage("Product usedFor is required"),
     body("product_details")
       .isArray()
-      .withMessage("Product details must be array"),
+      .notEmpty()
+      .withMessage("Product details is required"),
   ],
   productController.addNewProduct
 );
@@ -81,5 +82,25 @@ router.put(
 //delete product
 //DELETE /product/:id
 router.delete("/product/:id", authMiddleware, productController.deleteProduct);
+
+//upload product image
+//POST /upload
+router.post("/upload", authMiddleware, productController.uploadProductImages);
+
+//get saved product images
+//GET /product-images/:id
+router.get(
+  "/product-images/:id",
+  authMiddleware,
+  productController.getSavedImages
+);
+
+//delete saved product images
+//DELETE /products/images/destroy/:productId/:imgToDelete
+router.delete(
+  "/products/images/destroy/:productId/:imgToDelete",
+  authMiddleware,
+  productController.deleteSavedProductImages
+);
 
 module.exports = router;
