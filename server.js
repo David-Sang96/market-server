@@ -7,6 +7,7 @@ require("dotenv").config();
 
 const authRoutes = require("./routes/auth");
 const productRoutes = require("./routes/product");
+const adminRoutes = require("./routes/admin");
 
 const storageConfig = multer.diskStorage({
   filename: (req, file, cb) => {
@@ -40,6 +41,7 @@ app.use(
 // routes
 app.use(authRoutes);
 app.use(productRoutes);
+app.use("/admin", adminRoutes);
 
 mongoose
   .connect(process.env.MONGO_URL)
