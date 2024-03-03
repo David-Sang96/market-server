@@ -90,7 +90,7 @@ const updateUserStatus = async (req, res, status) => {
     await userDoc.save();
     return res.status(200).json({
       isSuccess: true,
-      message: `User is ${status === "ban" ? "banned" : "unbanned"}.`,
+      message: `User is ${status === "banned" ? "banned" : "unbanned"}.`,
     });
   } catch (error) {
     return res.status(500).json({
@@ -101,7 +101,7 @@ const updateUserStatus = async (req, res, status) => {
 };
 
 exports.banUser = async (req, res) => {
-  await updateUserStatus(req, res, "ban");
+  await updateUserStatus(req, res, "banned");
 };
 exports.unBanUser = async (req, res) => {
   await updateUserStatus(req, res, "active");
