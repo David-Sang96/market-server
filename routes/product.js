@@ -81,7 +81,7 @@ router.put(
 
 //delete product
 //DELETE /product/:id
-router.delete("/product/:id", authMiddleware, productController.deleteProduct);
+router.delete("/products/:id", authMiddleware, productController.deleteProduct);
 
 //upload product image
 //POST /upload
