@@ -1,5 +1,6 @@
 const { validationResult } = require("express-validator");
 const Product = require("../models/product");
+const SavedProduct = require("../models/savedProducts");
 const { v2: cloudinary } = require("cloudinary");
 require("dotenv").config();
 
@@ -255,6 +256,83 @@ exports.deleteSavedProductImages = async (req, res) => {
     });
   } catch (error) {
     return res.status(404).json({
+      isSuccess: false,
+      message: error.message,
+    });
+  }
+};
+
+exports.savedProducts = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const existingSavedProduct = await SavedProduct.findOne({
+      user_id: req.userId,
+      product_id: id,
+    });
+
+    if (existingSavedProduct) {
+      return res.status(200).json({
+        isSuccess: true,
+        message: "Product is already saved.",
+      });
+    }
+    await SavedProduct.create({
+      user_id: req.userId,
+      product_id: id,
+    });
+
+    return res.status(200).json({
+      isSuccess: true,
+      message: "Product Saved.",
+    });
+  } catch (error) {
+    return res.status(401).json({
+      isSuccess: false,
+      message: error.message,
+    });
+  }
+};
+
+exports.getSavedProducts = async (req, res) => {
+  try {
+    const productDocs = await SavedProduct.find({
+      user_id: req.userId,
+    }).populate("product_id", "name category images description");
+
+    if (!productDocs || productDocs.length === 0) {
+      throw new Error("No products are not saved yet.");
+    }
+    return res.status(200).json({
+      isSuccess: true,
+      productDocs,
+    });
+  } catch (error) {
+    return res.status(404).json({
+      isSuccess: false,
+      message: error.message,
+    });
+  }
+};
+
+exports.deleteSavedProducts = async (req, res) => {
+  try {
+    const { id } = req.params;
+    // const existingSavedProduct = await SavedProduct.findOne({
+    //   user_id: req.userId,
+    //   product_id: id,
+    // });
+    // if (!existingSavedProduct) {
+    //   throw new Error("Product not found.");
+    // }
+    // await SavedProduct.findByIdAndDelete(existingSavedProduct._id);
+    await SavedProduct.findOneAndDelete({ product_id: id });
+    return res.status(200).json({
+      isSuccess: true,
+      message: "Product unsaved.",
+    });
+  } catch (error) {
+    return res.status(500).json({
       isSuccess: false,
       message: error.message,
     });

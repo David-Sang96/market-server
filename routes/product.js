@@ -103,4 +103,28 @@ router.delete(
   productController.deleteSavedProductImages
 );
 
+//save products
+//POST /saved-products/:id
+router.post(
+  "/saved-products/:id",
+  authMiddleware,
+  productController.savedProducts
+);
+
+// get save products
+// GET /saved-products
+router.get(
+  "/saved-products",
+  authMiddleware,
+  productController.getSavedProducts
+);
+
+// delete save products
+// DELETE /saved-products
+router.delete(
+  "/unsaved-products/:id",
+  authMiddleware,
+  productController.deleteSavedProducts
+);
+
 module.exports = router;

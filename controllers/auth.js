@@ -65,7 +65,7 @@ exports.login = async (req, res, next) => {
     }
 
     // account status  check
-    if (userDoc.status === "ban") {
+    if (userDoc.status === "banned") {
       throw new Error("This account was banned.");
     }
 
