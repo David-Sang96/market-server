@@ -17,16 +17,30 @@ exports.getCategories = async (req, res) => {
 };
 
 exports.getProducts = async (req, res) => {
+  const page = parseInt(req.query.page) || 1;
+  const perPageProducts = 4;
+
   try {
     const productDocs = await Product.find({ status: "approve" })
       .populate("seller", "name")
       .sort({
         createdAt: -1,
-      });
+      })
+      .skip((page - 1) * perPageProducts)
+      .limit(perPageProducts);
+
+    const totalProductsCount = await Product.find({
+      status: "approve",
+    }).countDocuments();
+    const totalPages = Math.ceil(totalProductsCount / perPageProducts);
+
     return res.status(200).json({
       isSuccess: true,
       message: "Product lists are ready to view",
       productDocs,
+      totalPages,
+      currentPage: page,
+      totalProductsCount,
     });
   } catch (error) {
     return res.status(422).json({

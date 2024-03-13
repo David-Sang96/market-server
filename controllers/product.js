@@ -53,15 +53,29 @@ exports.addNewProduct = async (req, res) => {
 };
 
 exports.getAllProducts = async (req, res) => {
+  const page = parseInt(req.query.page) || 1;
+  const perPage = 10;
+
   try {
-    const productDoc = await Product.find({ seller: req.userId }).sort({
-      createdAt: -1,
-    });
+    const productDoc = await Product.find({ seller: req.userId })
+      .sort({
+        createdAt: -1,
+      })
+      .skip((page - 1) * perPage)
+      .limit(perPage);
+
+    const totalProductsCount = await Product.find({
+      seller: req.userId,
+    }).countDocuments();
+    const totalPages = Math.ceil(totalProductsCount / perPage);
 
     return res.status(200).json({
       isSuccess: true,
       message: "Product datas have been fetched successfully",
       productDoc,
+      currentPage: page,
+      totalProductsCount,
+      totalPages,
     });
   } catch (error) {
     return res.status(422).json({
@@ -266,17 +280,25 @@ exports.savedProducts = async (req, res) => {
   try {
     const { id } = req.params;
 
+    // const existingSavedProduct = await SavedProduct.findOne({
+    //   user_id: req.userId,
+    //   product_id: id,
+    // });
+
+    // if (existingSavedProduct) {
+    //   return res.status(200).json({
+    //     isSuccess: true,
+    //     message: "Product is already saved.",
+    //   });
+    // }
     const existingSavedProduct = await SavedProduct.findOne({
-      user_id: req.userId,
-      product_id: id,
+      $and: [{ user_id: req.userId }, { product_id: id }],
     });
 
     if (existingSavedProduct) {
-      return res.status(200).json({
-        isSuccess: true,
-        message: "Product is already saved.",
-      });
+      throw new Error("Product is already saved.");
     }
+
     await SavedProduct.create({
       user_id: req.userId,
       product_id: id,
@@ -298,10 +320,10 @@ exports.getSavedProducts = async (req, res) => {
   try {
     const productDocs = await SavedProduct.find({
       user_id: req.userId,
-    }).populate("product_id", "name category images description");
+    }).populate("product_id", "name category images description price");
 
     if (!productDocs || productDocs.length === 0) {
-      throw new Error("No products are not saved yet.");
+      throw new Error("No products are saved yet.");
     }
     return res.status(200).json({
       isSuccess: true,

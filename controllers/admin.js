@@ -3,13 +3,41 @@ const User = require("../models/user");
 
 // products
 exports.getAllProducts = async (req, res) => {
+  const page = parseInt(req.query.page) || 1;
+  const perPage = 10;
   try {
     const productDocs = await Product.find()
       .populate("seller", "name") //get data from another Model and its key ("seller name") will get the seller doc
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * perPage)
+      .limit(10);
+
+    const totalProductCount = await Product.countDocuments();
+    const totalPages = Math.ceil(totalProductCount / perPage);
+    const pendingProducts = await Product.find({ status: "pending" });
+
     return res.status(200).json({
       isSuccess: true,
       message: "Products list is ready to view",
+      productDocs,
+      totalPages,
+      currentPage: page,
+      totalProductCount,
+      pendingProducts,
+    });
+  } catch (error) {
+    return res.status(422).json({
+      isSuccess: false,
+      message: error.message,
+    });
+  }
+};
+
+exports.getProductsForBar = async (req, res) => {
+  try {
+    const productDocs = await Product.find();
+    return res.status(200).json({
+      isSuccess: true,
       productDocs,
     });
   } catch (error) {

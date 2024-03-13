@@ -1,5 +1,4 @@
 const { Router } = require("express");
-const { body } = require("express-validator");
 
 const router = Router();
 const adminController = require("../controllers/admin");
@@ -13,6 +12,15 @@ router.get(
   authMiddleware,
   adminMiddleware,
   adminController.getAllProducts
+);
+
+// get all productsForBar
+// GET /admin/products-by-categories
+router.get(
+  "/products-by-categories",
+  authMiddleware,
+  adminMiddleware,
+  adminController.getProductsForBar
 );
 
 //approve product

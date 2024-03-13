@@ -9,6 +9,8 @@ const authRoutes = require("./routes/auth");
 const productRoutes = require("./routes/product");
 const adminRoutes = require("./routes/admin");
 const publicRoutes = require("./routes/public");
+const bidRoutes = require("./routes/bit.route");
+const notificationRoutes = require("./routes/notification.route");
 
 const storageConfig = multer.diskStorage({
   filename: (req, file, cb) => {
@@ -42,6 +44,8 @@ app.use(
 // routes
 app.use(authRoutes);
 app.use(productRoutes);
+app.use(bidRoutes);
+app.use(notificationRoutes);
 app.use("/admin", adminRoutes);
 app.use("/api", publicRoutes);
 
