@@ -51,9 +51,15 @@ exports.markAsRead = async (req, res) => {
   try {
     const { id } = req.params;
     const notiDoc = await Notification.findById(id);
+
+    if (req.userId.toString() !== notiDoc.owner_id.toString()) {
+      throw new Error("Authorization Failed.");
+    }
+
     if (!notiDoc) throw new Error("notification not found.");
     notiDoc.isRead = true;
     notiDoc.save();
+
     return res.status(200).json({
       isSuccess: true,
       message: "marked as read",
@@ -70,9 +76,15 @@ exports.markAsUnRead = async (req, res) => {
   try {
     const { id } = req.params;
     const notiDoc = await Notification.findById(id);
+
+    if (req.userId.toString() !== notiDoc.owner_id.toString()) {
+      throw new Error("Authorization Failed.");
+    }
+
     if (!notiDoc) throw new Error("notification not found.");
     notiDoc.isRead = false;
     notiDoc.save();
+
     return res.status(200).json({
       isSuccess: true,
       message: "marked as unread",
@@ -88,6 +100,12 @@ exports.markAsUnRead = async (req, res) => {
 exports.deleteSingleNotification = async (req, res) => {
   try {
     const { id } = req.params;
+    const notiDoc = await Notification.findById(id);
+
+    if (req.userId.toString() !== notiDoc.owner_id.toString()) {
+      throw new Error("Authorization Failed.");
+    }
+
     await Notification.findByIdAndDelete(id);
     return res.status(200).json({
       isSuccess: true,

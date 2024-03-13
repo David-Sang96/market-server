@@ -11,6 +11,11 @@ exports.createBid = async (req, res) => {
   }
   try {
     const { comment, phone, product_id, seller_id, buyer_id } = req.body;
+
+    if (seller_id === buyer_id) {
+      throw new Error("Authorization failed.");
+    }
+
     await Bid.create({
       product_id,
       seller_id,
